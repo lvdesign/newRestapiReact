@@ -4,6 +4,8 @@ bodyParser = require('body-parser');
 const leaderRouter = express.Router();
 const mongoose = require('mongoose');
 const Leaders =  require('../models/leaders');
+const authenticate = require('../authenticate');
+
 
 leaderRouter.use(bodyParser.json());
 
@@ -18,7 +20,7 @@ leaderRouter.route('/')
         }, (err) => next(err))
             .catch((err) => next(err));
 })
-.post((req,res,next) => {    
+.post( authenticate.verifyUser, (req,res,next) => {    
     Leaders.create(req.body)
         .then((leader) => {
             console.log('Dish created : ', leader)

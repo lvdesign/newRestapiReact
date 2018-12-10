@@ -5,6 +5,8 @@ const mongoose = require('mongoose');
 var User = require('../models/user');
 var passport = require('passport');
 
+var authenticate = require('../authenticate');
+
 var router = express.Router();
 router.use(bodyParser.json());
 
@@ -27,6 +29,7 @@ router.get('/',(req, res, next) => {
           res.json({err: err});
         });
 });
+// post, put, delete pour admin
 
 // POST creation du new user:  /users/signup
 router.post('/signup', (req, res, next) => {
@@ -49,16 +52,18 @@ router.post('/signup', (req, res, next) => {
 
 //// POST login user : /users/login
 router.post('/login', passport.authenticate('local'), (req, res) => {
+
+  var token = authenticate.getToken({_id: req.user._id});
   res.statusCode = 200;
   res.setHeader('Content-Type', 'application/json');
-  res.json({success: true, status: 'You are Successful LOGIN OK !'});
+  res.json({success: true, token:token, status: 'You are Successful LOGIN OK !' });
 });
 
 // GET LOGOUT :  /users/logout
 router.get('/logout', (req, res) => {
   if (req.session) {
-    req.session.destroy();
-    res.clearCookie('session-id');
+    //req.session.destroy();
+    //res.clearCookie('session-id');
     res.redirect('/');
   }
   else {

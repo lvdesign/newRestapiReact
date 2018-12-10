@@ -4,6 +4,8 @@ bodyParser = require('body-parser');
 const promoRouter = express.Router();
 const mongoose = require('mongoose');
 const Promotions =  require('../models/promotions');
+const authenticate = require('../authenticate');
+
 
 promoRouter.use(bodyParser.json());
 
@@ -18,7 +20,7 @@ promoRouter.route('/')
         }, (err) => next(err))
             .catch((err) => next(err));
 })
-.post((req,res,next) => {    
+.post( authenticate.verifyUser, (req,res,next) => {    
     Promotions.create(req.body)
         .then((promotion) => {
             console.log('promotion created : ', promotion)
