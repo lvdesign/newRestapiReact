@@ -6,9 +6,10 @@ var logger = require('morgan');
 
 var session = require('express-session');
 var FileStore = require('session-file-store')(session);
+var passport = require('passport');
+var authenticate = require('./authenticate');
 
 const mongoose = require('mongoose');
-
 
 // ROUTER
 var indexRouter = require('./routes/index');
@@ -49,28 +50,23 @@ app.use(session({
     store: new FileStore()
   }));
 
+// Passport action
+app.use(passport.initialize());
+app.use(passport.session());
+
 // ROUTER ---- pour login
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
 // autentification base dans USERs route
-function auth (req, res, next) {
-    console.log(req.session);
-
-  if(!req.session.user) {
+function auth (req, res, next) {    
+  if(!req.user) {
       var err = new Error('You are not authenticated! app --');
       err.status = 403;
       return next(err);
   }
-  else {
-    if (req.session.user === 'authenticated') {
+  else {    
       next();
-    }
-    else {
-      var err = new Error('You are not authenticated! -- app2');
-      err.status = 403;
-      return next(err);
-    }
   }
 }
 
